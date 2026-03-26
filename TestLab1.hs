@@ -11,7 +11,6 @@ r = V "r"
 q = V "q"
 
 
-
 form1_cantBin_test = TestCase (assertEqual "cantBin form1" 0 (cantBin form1))
 form2_cantBin_test = TestCase (assertEqual "cantBin form2" 2 (cantBin form2))
 form3_cantBin_test = TestCase (assertEqual "cantBin form3" 1 (cantBin form3))

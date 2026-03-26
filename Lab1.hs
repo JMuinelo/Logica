@@ -5,6 +5,9 @@ module Lab1 where
 ----------------------------------------------------
 
 import Prelude
+import Data.List
+
+
 
 -- EJERCICIO 1.1 --
 type Var = String
@@ -20,16 +23,16 @@ data BC = Or | And | Imp | Iff
 -- EJERCICIO 1.2 --
 --a)p ∧ ¬¬q
 fa :: L
-fa = Bin And (V "p")(Neg (Neg (V "q")))
+fa = Bin  (V "p") And (Neg (Neg (V "q")))
 --b) p ∧ ¬ q ∧ ¬ r
 fb :: L
-fb = Bin And ((V "p"))(Bin And (Neg (V "q")) (Neg (V "r"))) --p ∧ (¬ q ∧ (¬ r))
+fb = Bin  ((V "p")) And (Bin  (Neg (V "q")) And (Neg (V "r"))) --p ∧ (¬ q ∧ (¬ r))
 --c)¬¬ p ∨ ¬ (q ∧ p)
 fc :: L
-fc = Bin Or (Neg(Neg (V "p"))) (Neg (Bin And (V "q") (V "p")))
+fc = Bin  (Neg(Neg (V "p"))) Or (Neg (Bin  (V "q")  And (V "p")))
 --d)¬(r ⊃ r) ∧ (¬¬ p ∨ ¬ (q ∧ p))
 fd :: L
-fd = Bin And (Neg(Bin Imp (V "r") (V "r"))) (Bin Or (Neg (Neg (V "p"))) (Neg (Bin And (V "q") (V "p"))))
+fd = Bin  (Neg(Bin  (V "r") Imp (V "r"))) And (Bin  (Neg (Neg (V "p"))) Or (Neg (Bin  (V "q") And (V "p"))))
 
 
 -- EJERCICIO 1.3 --
@@ -57,7 +60,7 @@ dobleNeg (Bin f1 c  f2) =  Bin (dobleNeg f1) c (dobleNeg f2)
 cambiar :: L -> L
 cambiar (V p) = V p
 cambiar (Neg f) = Neg (cambiar f)
-cambiar (Bin Or f1 f2) = Bin Imp (Neg f1) (f2)
+cambiar (Bin f1 Or f2) = Bin (Neg f1) Imp (f2)
 cambiar (Bin f1 b  f2)= Bin (cambiar f1) b  f2 
 
 --e)
@@ -71,7 +74,9 @@ cantPropX(Bin f1 b f2) (q) = cantPropX (f1) (q) + cantPropX (f2) (q)
 --f)
 listarProp :: L -> [Var]
 listarProp (V p) = [p]
-listarProp (Neg f) = listarProp f
+listarProp (Neg f) = nub (listarProp f)
+listarProp (Bin f1 b f2) = nub (listarProp f1 ++ listarProp f2)
+
 
 
 --g)
@@ -94,13 +99,18 @@ swapCon (Bin f1 c  f2) b1 b2
 --i)
 invertir :: L -> L
 invertir (V p) = Neg (V p)
+invertir (Neg (V p)) = (V p)
 invertir (Neg f) = dobleNeg (Neg (invertir f))
-invertir (Bin  f1 c f2) = dobleNeg (swapCon (Bin (invertir f1) c (invertir f1) (invertir f2)) And Or)
+invertir (Bin  f1 c f2) = dobleNeg (swapCon (Bin (invertir f1) c (invertir f2)) And Or)
 
 --j)
 sustSimp :: Var -> L -> L -> L
-sustSimp = undefined
+sustSimp (p beta (Px)) 
+    | x==p = beta
+    | otherwise P x
+sustSimp p beta (Neg f) = Neg (sustSimp p beta f)
+sustSimp p beta (bin f1 c f2) = bin (sustSimp p beta f1) c (sustSimp p beta f2)
 
 --k)
 sustMult :: [(Var, L)] -> L -> L
-sustMult = undefined
+sustMult [(V p, alfa )] beta = sustSimp alfa beta p 
