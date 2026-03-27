@@ -1,11 +1,14 @@
 module Lab1 where
 ------------------- Estudiante/s -------------------
--- Nombres y apellidos: 
--- Números: 
+-- Nombres y apellidos: Juan Muinelo | Joaquin Moreira
+-- Números: 350499 | 
 ----------------------------------------------------
 
 import Prelude
 import Data.List
+
+-- docker run --rm --volume "$(pwd)/:/myFiles" -it haskell
+-- :l myFiles/bool.hs
 
 
 
@@ -105,12 +108,17 @@ invertir (Bin  f1 c f2) = dobleNeg (swapCon (Bin (invertir f1) c (invertir f2)) 
 
 --j)
 sustSimp :: Var -> L -> L -> L
-sustSimp (p beta (Px)) 
+sustSimp p beta (V x)
     | x==p = beta
-    | otherwise P x
+    | otherwise = (V x)
 sustSimp p beta (Neg f) = Neg (sustSimp p beta f)
-sustSimp p beta (bin f1 c f2) = bin (sustSimp p beta f1) c (sustSimp p beta f2)
+sustSimp p beta (Bin f1 c f2) = Bin (sustSimp p beta f1) c (sustSimp p beta f2)
 
 --k)
 sustMult :: [(Var, L)] -> L -> L
-sustMult [(V p, alfa )] beta = sustSimp alfa beta p 
+sustMult sigma (V p) = case (lookup p sigma) of{
+    Just f -> f;
+    Nothing -> V p;
+}
+sustMult sigma (Neg f) = Neg (sustMult sigma f)
+sustMult sigma (Bin f1 b f2) = Bin (sustMult sigma f1) b (sustMult sigma f2)
