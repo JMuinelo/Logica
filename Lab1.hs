@@ -48,7 +48,9 @@ cantBin (Bin f1 _ f2) = 1 + cantBin f1 + cantBin f2
 --b)
 valores :: L -> [(Var,Bool)]
 valores (V p) = [(p,True)]
-valores (Neg (V p)) = [(p,False)]
+valores (Neg f)
+    |f == (V p) = [(p,False)]
+    |otherwise = Neg(valores f)
 valores (Bin f1 _ f2)= valores f1 ++ valores f2
 
 --c)
@@ -64,7 +66,7 @@ cambiar :: L -> L
 cambiar (V p) = V p
 cambiar (Neg f) = Neg (cambiar f)
 cambiar (Bin f1 Or f2) = Bin (Neg f1) Imp (f2)
-cambiar (Bin f1 b  f2)= Bin (cambiar f1) b  f2 
+cambiar (Bin f1 b  f2)= Bin (cambiar f1) b  (cambiar f2)
 
 --e)
 cantPropX :: L -> Var -> Int
